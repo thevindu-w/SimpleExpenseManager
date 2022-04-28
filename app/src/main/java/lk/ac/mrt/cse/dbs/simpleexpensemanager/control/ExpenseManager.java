@@ -34,8 +34,10 @@ import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.Transaction;
  * method to setup the DAO objects depending on the implementation.
  */
 public abstract class ExpenseManager implements Serializable {
-    private AccountDAO accountsHolder;
-    private TransactionDAO transactionsHolder;
+    /* All the non-Serializable attributes must be declared transient. Otherwise, NotSerializableException
+    will be thrown when app goes to background causing the app to crash*/
+    private transient AccountDAO accountsHolder;
+    private transient TransactionDAO transactionsHolder;
 
     /***
      * Get list of account numbers as String.
