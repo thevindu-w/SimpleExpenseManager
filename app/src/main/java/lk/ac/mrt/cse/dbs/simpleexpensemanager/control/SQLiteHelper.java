@@ -73,6 +73,7 @@ public class SQLiteHelper extends SQLiteOpenHelper implements Serializable {
             contentValues.put(ACCOUNT_HOLDER_NAME_FIELD, account.getAccountHolderName());
             contentValues.put(BALANCE_FIELD, account.getBalance());
             db.insert(ACCOUNT_TABLE, null, contentValues);
+            db.close();
         } catch (RuntimeException ignored) {
         }
     }
@@ -81,7 +82,9 @@ public class SQLiteHelper extends SQLiteOpenHelper implements Serializable {
         if (accountNo==null) return false;
         try {
             SQLiteDatabase db = this.getWritableDatabase();
-            return db.delete(ACCOUNT_TABLE, ACCOUNT_NO_FIELD+"=?", new String[]{accountNo}) > 0;
+            boolean status = db.delete(ACCOUNT_TABLE, ACCOUNT_NO_FIELD+"=?", new String[]{accountNo}) > 0;
+            db.close();
+            return status;
         } catch (RuntimeException ignored) {
             return false;
         }
@@ -97,6 +100,7 @@ public class SQLiteHelper extends SQLiteOpenHelper implements Serializable {
             if (!cursor.moveToFirst()) return null;
             Account account = new Account(accountNo, cursor.getString(0), cursor.getString(1), Double.parseDouble(cursor.getString(2)));
             cursor.close();
+            db.close();
             return account;
         } catch (RuntimeException ignored) {
             return null;
@@ -117,6 +121,7 @@ public class SQLiteHelper extends SQLiteOpenHelper implements Serializable {
                 } while (cursor.moveToNext());
             }
             cursor.close();
+            db.close();
             return accountList;
         } catch (RuntimeException ignored) {
             return new ArrayList<>();
@@ -136,6 +141,7 @@ public class SQLiteHelper extends SQLiteOpenHelper implements Serializable {
                 } while (cursor.moveToNext());
             }
             cursor.close();
+            db.close();
             return accountNumbersList;
         } catch (RuntimeException ignored) {
             return new ArrayList<>();
@@ -148,6 +154,7 @@ public class SQLiteHelper extends SQLiteOpenHelper implements Serializable {
             ContentValues contentValues = new ContentValues();
             contentValues.put(BALANCE_FIELD, newBalance);
             db.update(ACCOUNT_TABLE, contentValues, ACCOUNT_NO_FIELD+"=?", new String[]{accountNo});
+            db.close();
         } catch (RuntimeException ignored) {
         }
     }
@@ -161,6 +168,7 @@ public class SQLiteHelper extends SQLiteOpenHelper implements Serializable {
             contentValues.put(AMOUNT_FIELD, transaction.getAmount());
             contentValues.put(DATE_FIELD, transaction.getDate().getTime());
             db.insert(TRANSACTION_TABLE, null, contentValues);
+            db.close();
         } catch (RuntimeException ignored) {
         }
     }
@@ -185,6 +193,7 @@ public class SQLiteHelper extends SQLiteOpenHelper implements Serializable {
             }
             cursor.close();
             Collections.reverse(transactionList);
+            db.close();
             return transactionList;
         } catch (RuntimeException ignored) {
             return new ArrayList<>();
