@@ -1,6 +1,7 @@
 # Ignore everything in this file
 target/
 app/build/
+build/
 .classpath
 .settings
 .project
