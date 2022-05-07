@@ -26,7 +26,7 @@ jobs:
       run: ./gradlew build
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
     - name: checkout
       uses: actions/checkout@v3
