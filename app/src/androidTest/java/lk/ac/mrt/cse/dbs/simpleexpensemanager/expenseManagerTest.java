@@ -39,7 +39,7 @@ public class expenseManagerTest {
             accountDAO.removeAccount(accountNumber);
         } catch (InvalidAccountException ignored) {
         }
-
+        //add account to test
         expenseManager.addAccount(accountNumber, bankName, accountHolderName, balance);
 
         Account retrievedAccount = null;
@@ -48,8 +48,10 @@ public class expenseManagerTest {
         } catch (InvalidAccountException e) {
             e.printStackTrace();
         }
+        // the added account should be returned
         assertNotNull(retrievedAccount);
 
+        // check if the account details are same
         String retAccountNumber = retrievedAccount.getAccountNo();
         assertEquals(accountNumber, retAccountNumber);
         String retBankName = retrievedAccount.getBankName();
@@ -72,12 +74,13 @@ public class expenseManagerTest {
             accountDAO.removeAccount(accountNumber);
         } catch (InvalidAccountException ignored) {
         }
-
+        // add account to check
         expenseManager.addAccount(accountNumber, bankName, accountHolderName, balance);
 
         List<String> accountNumbers = expenseManager.getAccountNumbersList();
         assertNotNull(accountNumbers);
-        assertFalse(accountNumbers.isEmpty());
+        // newly added account number should be in the list
+        assertTrue(accountNumbers.contains(accountNumber));
     }
 
     @Test
@@ -85,7 +88,7 @@ public class expenseManagerTest {
         String accountNumber = "72839U";
         String bankName = "Bank001";
         String accountHolderName = "Holder001";
-        double balance = 1000.;
+        double balance = 1000.; // initial balance
         double increment = 2000.;
         AccountDAO accountDAO = expenseManager.getAccountsDAO();
 
@@ -93,7 +96,7 @@ public class expenseManagerTest {
             accountDAO.removeAccount(accountNumber);
         } catch (InvalidAccountException ignored) {
         }
-
+        //make the account to update balance
         expenseManager.addAccount(accountNumber, bankName, accountHolderName, balance);
 
         try {
@@ -110,8 +113,9 @@ public class expenseManagerTest {
         }
         assertNotNull(retrievedAccount);
 
-        double retBalance = retrievedAccount.getBalance();
-        assertEquals(balance + increment, retBalance, 0.0001);
+        double newBalance = retrievedAccount.getBalance();
+        // new balance should be balance + increment
+        assertEquals(balance + increment, newBalance, 0.0001);
     }
 
     @Test
@@ -119,6 +123,7 @@ public class expenseManagerTest {
         String accountNumber = "notExist";
         AccountDAO accountDAO = expenseManager.getAccountsDAO();
 
+        // remove the account if exists
         try {
             accountDAO.removeAccount(accountNumber);
         } catch (InvalidAccountException ignored) {
@@ -127,9 +132,9 @@ public class expenseManagerTest {
         Account retrievedAccount = null;
         try {
             retrievedAccount = accountDAO.getAccount(accountNumber);
-        } catch (InvalidAccountException e) {
-            e.printStackTrace();
+        } catch (InvalidAccountException ignored) {
         }
+        // account should be null since it doesn't exist
         assertNull(retrievedAccount);
     }
 
@@ -146,15 +151,26 @@ public class expenseManagerTest {
         } catch (InvalidAccountException ignored) {
         }
 
+        //create an account to make a transaction
         expenseManager.addAccount(accountNumber, bankName, accountHolderName, balance);
 
         TransactionDAO transactionDAO = expenseManager.getTransactionsDAO();
+        // get the number of transactions before making a transaction
+        List<Transaction> beforeTransactions = expenseManager.getTransactionLogs();
+        assertNotNull(beforeTransactions);
+        int beforeCnt = beforeTransactions.size();
+
+        //make a transaction
         Date date = new Date();
         double amount = 500.;
         transactionDAO.logTransaction(date, accountNumber, ExpenseType.INCOME, amount);
 
-        List<Transaction> transactions = expenseManager.getTransactionLogs();
-        assertNotNull(transactions);
-        assertFalse(transactions.isEmpty());
+        // get the number of transactions after making a transaction
+        List<Transaction> afterTransactions = expenseManager.getTransactionLogs();
+        assertNotNull(afterTransactions);
+        int afterCnt = afterTransactions.size();
+
+        // number of transactions in the log should have been increased by 1 after transaction
+        assertEquals(afterCnt, beforeCnt+1);
     }
 }
